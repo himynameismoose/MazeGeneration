@@ -1,5 +1,7 @@
 package core;
 
+import java.util.*;
+
 /**
  * @author Mershelle Rivera
  * @version 1.0
@@ -8,6 +10,10 @@ package core;
  */
 public class Graph
 {
+    private Map<Integer, LinkedList<Edge>> adjacencyLists;
+    private boolean[] marked;
+    private int[] edgeTo;
+    private int source;
 
     /**
      * Constructor for a graph that initializes list
@@ -16,17 +22,21 @@ public class Graph
      */
     public Graph(int cols)
     {
-
+        adjacencyLists = new HashMap<>();
+        this.source = cols * cols - 1;
     }
 
     /**
-     * Adds an vertex to the graph
+     * Adds a vertex to the graph
      *
      * @param element int vertex
      */
     public void addVertex(int element)
     {
-
+        if (!hasVertex(element))
+        {
+            adjacencyLists.put(element, new LinkedList<>());
+        }
     }
 
     /**
@@ -37,7 +47,21 @@ public class Graph
      */
     public void addEdge(int source, int dest)
     {
+        if (!hasVertex(source) || !hasVertex(dest))
+        {
+            throw new IllegalArgumentException("The vertex does not exist: " + source + ", " + dest);
+        }
 
+        Edge newEdge = new Edge(source, dest);
+        Edge reversedNewEdge = new Edge(dest, source);
+        LinkedList<Edge> adjListSource = adjacencyLists.get(source);
+        LinkedList<Edge> adjListDest = adjacencyLists.get(dest);
+
+        if (!adjListSource.contains(newEdge) && !adjListDest.contains(reversedNewEdge))
+        {
+            adjListSource.add(newEdge);
+            adjListDest.add(reversedNewEdge);
+        }
     }
 
     /**
@@ -48,7 +72,7 @@ public class Graph
      */
     public boolean hasVertex(int element)
     {
-        return false;
+        return adjacencyLists.containsKey(element);
     }
 
     /**
@@ -60,8 +84,21 @@ public class Graph
      */
     public boolean hasEdge(int vertex, int edge)
     {
+        if (hasVertex(vertex) && hasVertex(edge))
+        {
+            LinkedList<Edge> adjacencyList = adjacencyLists.get(vertex);
+
+            // if edge exist for this vertex
+            return adjacencyList.contains(new Edge(vertex, edge));
+        }
 
         return false;
+    }
+
+    // Helper method to return set of edges for a vertex
+    private LinkedList<Edge> getEdges(int vertex)
+    {
+        return adjacencyLists.get(vertex);
     }
 
     /**
@@ -71,8 +108,35 @@ public class Graph
      */
     public Iterable<Integer> runBFS()
     {
+        this.marked = new boolean[this.size()];
+        edgeTo = new int[this.size()];
+        bfs(this.source);
+        int destination = 0;
 
-        return null;
+        return pathTo(destination);
+    }
+
+    // Helper method to run bfs search algorithm
+    private void bfs(int source)
+    {
+        LinkedList<Integer> queue = new LinkedList<>();
+        this.marked[source] = true;
+        queue.add(source);
+
+        while (!queue.isEmpty())
+        {
+            int vertex = queue.pop();
+
+            for (Edge edge : getEdges(vertex))
+            {
+                if (!marked[edge.getDest()])
+                {
+                    marked[edge.getDest()] = true;
+                    edgeTo[edge.getDest()] = vertex;
+                    queue.add(edge.getDest());
+                }
+            }
+        }
     }
 
     /**
@@ -82,8 +146,44 @@ public class Graph
      */
     public Iterable<Integer> runDFS()
     {
+        this.marked = new boolean[this.size()];
+        edgeTo = new int[this.size()];
+        dfs(this.source);
+        int destination = 0;
 
-        return null;
+        return pathTo(destination);
+    }
+
+    // Helper method to run dfs
+    private void dfs(int vertex)
+    {
+        marked[vertex] = true;
+        LinkedList<Edge> neighbors = getEdges(vertex);
+
+        for (Edge edge : neighbors)
+        {
+            if (!marked[edge.getDest()])
+            {
+                edgeTo[edge.getDest()] = vertex;
+                dfs(edge.getDest());
+            }
+        }
+    }
+
+    // Helper method to return stack of elements to solve graph
+    private Stack<Integer> pathTo(int destination)
+    {
+        Stack<Integer> path = new Stack<>();
+
+        if (!marked[destination])
+            return null;
+
+        for (int i = destination; i != source; i = edgeTo[i])
+            path.push(i);
+
+        path.push(source);
+
+        return path;
     }
 
     /**
@@ -94,7 +194,7 @@ public class Graph
     public int size()
     {
 
-        return 0;
+        return this.adjacencyLists.size();
     }
 
     /**
@@ -102,6 +202,8 @@ public class Graph
      */
     public static class Edge
     {
+        private int source;
+        private int dest;
 
         /**
          * Constructor that creates an edge between source and destination
@@ -111,7 +213,8 @@ public class Graph
          */
         public Edge(int source, int dest)
         {
-
+            this.source = source;
+            this.dest = dest;
         }
 
         /**
@@ -121,7 +224,31 @@ public class Graph
          */
         public int getDest()
         {
-            return 0;
+            return dest;
         }
+
+        public int hashCode() {
+            return Objects.hash(source, dest);
+        }
+
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+
+            if (other == null || getClass() != other.getClass())
+                return false;
+
+            Edge otherEdge = (Edge) other;
+
+            return Objects.equals(source, otherEdge.source) && Objects.equals(dest, otherEdge.dest);
+        }
+
+        public String toString() {
+            return "Edge{source=" + source + ", dest=" + dest + "}";
+        }
+    }
+
+    public String toString() {
+        return "Graph{adjacencyLists=" + adjacencyLists + "}";
     }
 }
