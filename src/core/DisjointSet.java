@@ -1,5 +1,7 @@
 package core;
 
+import java.util.Arrays;
+
 /**
  * Class that keeps track of the sets in the graph and provide functionality to union sets
  *
@@ -8,6 +10,8 @@ package core;
  */
 public class DisjointSet
 {
+    private int count;
+    private int[] set;
 
     /**
      * Constructor that sets the size of the array
@@ -16,7 +20,9 @@ public class DisjointSet
      */
     public DisjointSet(int size)
     {
-
+        this.set = new int[size];
+        this.count = size;
+        Arrays.fill(this.set, -1);
     }
 
     /**
@@ -28,6 +34,25 @@ public class DisjointSet
      */
     public boolean union(int first, int second)
     {
+        int firstRoot = find(first);
+        int secondRoot = find(second);
+
+        if (firstRoot != secondRoot)
+        {
+            if (this.set[firstRoot] < this.set[secondRoot])
+                this.set[secondRoot] = firstRoot;
+            else if (this.set[secondRoot] < this.set[firstRoot])
+                this.set[firstRoot] = secondRoot;
+            else if (this.set[firstRoot] == this.set[secondRoot])
+            {
+                this.set[secondRoot] = firstRoot;
+                this.set[firstRoot]--;
+            }
+
+            count--;
+
+            return true;
+        }
 
         return false;
     }
@@ -38,8 +63,10 @@ public class DisjointSet
      */
     public int find(int element)
     {
-
-        return element;
+        if (this.set[element] < 0)
+            return element;
+        else
+            return set[element] = find(set[element]);
     }
 
     /**
@@ -49,7 +76,10 @@ public class DisjointSet
      */
     public int count()
     {
+        return this.count;
+    }
 
-        return 0;
+    public String toString() {
+        return "DisjointSet{set=" + Arrays.toString(set) + ", count=" + count + "}";
     }
 }
