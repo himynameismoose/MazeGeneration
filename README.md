@@ -16,3 +16,13 @@ A JavaFX application that generates mazes using graph-based algorithms and solve
 - [Contact](#contact)
 
 ---
+
+## Features
+
+- Generate random mazes using graph-based algorithms.
+- Solve mazes using:
+  - Depth-First Search (DFS)
+  - Breadth-First Search (BFS)
+- Visual representation of maze generation and solving processes.
+
+---
