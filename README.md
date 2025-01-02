@@ -26,3 +26,10 @@ A JavaFX application that generates mazes using graph-based algorithms and solve
 - Visual representation of maze generation and solving processes.
 
 ---
+
+## Demo
+
+![MazeGeneration Demo](https://github.com/himynameismoose/MazeGeneration/blob/master/src/img/dfs_solve.png)
+![MazeGeneration Demo](https://github.com/himynameismoose/MazeGeneration/blob/master/src/img/bfs_solve.png)
+
+---
